@@ -1,28 +1,27 @@
-require 'io/console'
-
+require 'io/console' unless RUBY_ENGINE == 'opal'
 module PGN
   class MoveText
     attr_accessor :notation, :annotation, :comment, :variations
-    
+
     def initialize(notation, annotation = nil, comment = nil, variations = nil)
       @notation = notation
       @annotation = annotation
       @comment = comment
       @variations = variations
     end
-    
+
     def ==(m)
       self.to_s == m.to_s
     end
-    
+
     def eql?(m)
       self == m
     end
-    
+
     def hash
       @notation.hash
     end
-    
+
     def to_s
       @notation
     end
@@ -101,6 +100,18 @@ module PGN
       self.positions.map {|p| p.to_fen.inspect }
     end
 
+    def back
+      index -= 1 if index > 0
+    end
+
+    def forward
+      index += 1 if index < self.moves.length
+    end
+
+    def to_s
+       self.positions[index].inspect
+    end
+
     # Interactively step through the game
     #
     # Use +d+ to move forward, +a+ to move backward, and +^C+ to exit.
@@ -118,7 +129,7 @@ module PGN
         when LEFT
           index -= 1 if index > 0
         when RIGHT
-          index += 1 if index < self.moves.length
+          forward
         when EXIT
           break
         end
